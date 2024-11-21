@@ -1,0 +1,19 @@
+{
+  "name": "tomcan/feed-importer",
+  "description": "Package to download and parse csv product feeds",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Tom Cannaerts",
+      "email": "mot@tom.be"
+    }
+  ],
+  "require": {
+    "ext-curl": "*",
+    "ext-zlib": "*"
+  },
+  "autoload": {
+    "psr-4": {"TomCan\\FeedImporter\\": "src/"}
+  }
+}
