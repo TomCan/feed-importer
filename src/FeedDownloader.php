@@ -43,7 +43,7 @@ class FeedDownloader
 
             case 'http':
             case 'ftp':
-            case 'ftps':
+            case 'ftp+ssl':
                 // curl download
                 $ch = curl_init($this->feed->getUrl());
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -54,7 +54,7 @@ class FeedDownloader
                     if ($this->feed->getTransportOptions()['auth']) {
                         curl_setopt($ch, CURLOPT_USERPWD, $this->feed->getTransportOptions()['auth']);
                     }
-                    if ('ftps' == $this->feed->getTransport()) {
+                    if ('ftp+ssl' == $this->feed->getTransport()) {
                         curl_setopt($ch, CURLOPT_USE_SSL, CURLFTPSSL_ALL);
                     }
                     if ($this->feed->getTransportOptions()['authssl']) {
