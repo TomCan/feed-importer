@@ -20,6 +20,25 @@ What if I told you that you now can just define the feed, write your logic to pr
 Tom's Feed Importer abstracts all the feed handling parts away and just gives you the records one by one, so that you
 can process them in small, sizeable parts.
 
+You can either use a foreach / generator approach, or a callback function. Whichever suits your needs the best.
+
+### With foreach / generator
+```
+    // define the feed
+    $feed = new FeedDefinition(['url' => 'https://raw.githubusercontent.com/TomCan/feed-importer/refs/heads/main/samples/toms-favorite-names.csv']);
+
+    // instantiate processor without callback
+    $processor = new FeedProcessorCsv($feed);
+    // instantiate downloader
+    $downloader = new FeedDownloader($feed, $processor);
+    // use ->generate function
+    foreach ($downloader->generate() as $row) {
+        echo 'Got a record: '.str_replace(PHP_EOL, ' ', print_r($row, true)).PHP_EOL;
+    }
+    // profit
+```
+
+### With callback function
 ```
     // define the feed
     $feed = new FeedDefinition(['url' => 'https://raw.githubusercontent.com/TomCan/feed-importer/refs/heads/main/samples/toms-favorite-names.csv']);
@@ -29,12 +48,13 @@ can process them in small, sizeable parts.
         echo 'Got a record: '.str_replace(PHP_EOL, ' ', print_r($row, true)).PHP_EOL;
     };
 
-    // instantiate processor
+    // instantiate processor with callback
     $processor = new FeedProcessorCsv($feed, $callback);
     // instantiate downloader
     $downloader = new FeedDownloader($feed, $processor);
+    // use ->download function
+    $downloader->download();    
     // profit
-    $downloader->download();
 ```
 
 It mostly comes down to defining your feed parameters with a `FeedDefinition`. See the [`options`](docs/options.md) page in the docs for a 
