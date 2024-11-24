@@ -11,7 +11,7 @@ class FeedProcessorCsv implements FeedProcessor
     private FeedDefinition $feedDefinition;
     private $callback;
 
-    public function __construct(FeedDefinition $feedDefinition, callable $callback)
+    public function __construct(FeedDefinition $feedDefinition, ?callable $callback = null)
     {
         $this->buffer = '';
         $this->feedDefinition = $feedDefinition;
@@ -91,5 +91,15 @@ class FeedProcessorCsv implements FeedProcessor
         if ($pos !== 0) {
             $this->buffer = substr($this->buffer, $pos);
         }
+    }
+
+    public function getCallback(): ?callable
+    {
+        return $this->callback;
+    }
+
+    public function setCallback(?callable $callback)
+    {
+        $this->callback = $callback;
     }
 }
