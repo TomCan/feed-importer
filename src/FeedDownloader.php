@@ -49,8 +49,15 @@ class FeedDownloader
                     } else {
                         $this->feedProcessor->data($data);
                     }
+
+                    if ($this->mustYield) {
+                        while (count($this->yieldableItems) > 0) {
+                            yield array_shift($this->yieldableItems);
+                        }
+                    }
                 }
                 fclose($fp);
+
                 break;
 
             case 'http':
@@ -115,6 +122,12 @@ class FeedDownloader
                     $this->feedProcessor->data($result);
                 } else {
                     $this->feedProcessor->data($this->feed->getUrl());
+                }
+
+                if ($this->mustYield) {
+                    while (count($this->yieldableItems) > 0) {
+                        yield array_shift($this->yieldableItems);
+                    }
                 }
 
                 break;
