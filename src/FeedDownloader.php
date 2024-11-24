@@ -74,11 +74,37 @@ class FeedDownloader
                     }
                 }
 
-                curl_exec($ch);
-                if (curl_errno($ch)) {
-                    throw new \RuntimeException(curl_error($ch));
+                if ($this->mustYield) {
+                    // wrap in curl_multi
+                    $cmh = curl_multi_init();
+                    curl_multi_add_handle($cmh, $ch);
+
+                    $stillRunning = 0;
+                    do {
+                        curl_multi_exec($cmh,$stillRunning);
+                        while (count($this->yieldableItems) > 0) {
+                            yield array_shift($this->yieldableItems);
+                        }
+                    } while($stillRunning > 0);
+                    // make sure to also yield last elements
+                    while (count($this->yieldableItems) > 0) {
+                        yield array_shift($this->yieldableItems);
+                    }
+
+                    if (curl_multi_errno($cmh)) {
+                        throw new \RuntimeException(curl_multi_strerror(curl_multi_errno($cmh)));
+                    }
+
+                    curl_multi_remove_handle($cmh, $ch);
+                    curl_multi_close($cmh);
+                } else {
+                    // just execute curl call
+                    curl_exec($ch);
+                    if (curl_errno($ch)) {
+                        throw new \RuntimeException(curl_error($ch));
+                    }
+                    curl_close($ch);
                 }
-                curl_close($ch);
 
                 break;
 
