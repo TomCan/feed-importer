@@ -8,6 +8,8 @@ class FeedDownloader
     private FeedProcessor $feedProcessor;
     private FeedDefinition $feed;
     private $inflateContext;
+    private bool $mustYield = false;
+    private array $yieldableItems = [];
 
     public function __construct(FeedDefinition $feed, FeedProcessor $feedProcessor)
     {
@@ -24,6 +26,16 @@ class FeedDownloader
     }
 
     public function download() {
+        // calling generate without actually looping over it will not actually call it
+        foreach ($this->generate() as $item) {}
+    }
+
+    public function generate() {
+        if (!is_callable($this->feedProcessor->getCallback())) {
+            // no callback given, use internal callback in combination with yield
+            $this->mustYield = true;
+            $this->feedProcessor->setCallback([$this, 'itemCallback']);
+        }
 
         switch ($this->feed->getTransport()) {
             case 'path':
@@ -94,5 +106,9 @@ class FeedDownloader
         }
 
         return strlen($data);
+    }
+
+    public function itemCallback(array $item) {
+        $this->yieldableItems[] = $item;
     }
 }
